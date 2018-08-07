@@ -1,0 +1,82 @@
+We start from this situation: 
+- we have singularity installed on our local pc (https://singularity.lbl.gov/install-linux)
+- we have the poisson_convergence example cloned on our pc (https://github.com/MSO4SC/fenics-hpc-cesga/tree/poisson_convergence/poisson_convergence) 
+  --> NB it is important, after cloning, to change branch with:
+      $ cd fenics-hpc-cesga
+      $ git fetch --all
+      $ git checkout ​poisson_convergence
+      $ cd poisson_convergence
+- we have the fenics singularity image already built on our pc (https://gitlab.srv.cesga.es/ncde/Unicorn/blob/master/build-fenics.bootstrap)
+
+--------------------------------------------
+
+HOW TO PREPARE THE ENVIRONMENT 
+
+1.  Log in in Cesga 
+    $ sudo /home/inatale/BCAM/MSO4SC/access/forticlientsslvpn/64bit/forticlientsslvpn_cli --server gateway.cesga.es:443 --vpnuser <username>@kth.se
+  
+   Then in a second terminal 
+    $ ssh otcfdina@ft2.cesga.es
+   change directory 
+    $ cd $LUSTRE
+   add the needed modules 
+    $ module add gcc/5.1
+    $ module add openmpi/1.10-gcc-5.1
+    $ module load singularity/2.4.2
+
+2. Copy the Poisson example from your pc to Lustre
+    $ scp ..
+
+5. Copy the singularity image on Lustre 
+    $ scp ...
+
+ As final situation you must have on Lustre: 
+  - build-fenics.simg singularity image 
+  - fenics-hpc-cesga folder  
+
+-------------------------------------------------------------------
+
+HOW TO COMPILE and RUN main.cpp FROM INSIDE THE SINGULARITY IMAGE 
+
+1. $ cd fenics-hpc-cesga/poisson_convergence
+   $ vim setenv_sing.sh and chaneg the $PREFIX value with your folder on Lustre
+   $ source setenv_sing.sh 
+
+2. Compile main.cpp
+   $ singularity exec -B $PREFIX/fenics-hpc-cesga:/home --pwd /home/poisson_convergence ../../build-fenics.simg make  
+
+3. Run the Poisson simulation with different number of precesses and save results 
+   $ salloc ..  --> first open convergenceruns_sing.sh to see how many processes we need
+   $ ./convergenceruns_sing.sh
+
+
+-------------------------------------------------------------------
+
+HOW TO CREATE A .TXT FILE COLLECTING ALL INFO
+
+$ python convergencetests_sing.py
+
+-------------------------------------------------------------------
+
+HOW TO MAKE PLOTS AND SAVE THEM IN A .PDF
+
+1. Import the final convergence_test_details.txt file on your local pc 
+2. $ pip install pylatex
+3. $ python -mpip install --user -U pip
+   $ python -mpip install --user -U matplotlib
+
+$ python plots.py
+
+(If there are problems with the python modules, copy convergence_test_details.txt on your local pc and then do $ python plots.py there)
+
+
+
+
+
+
+
+
+
+
+    
+
